@@ -29,7 +29,7 @@ const message = function(text, context) {
 
 app.post('/message', function(req, res) {
     var text = req.body.text;
-    var context = req.body.context;
+    var context = JSON.stringify(req.body.context);
 
     message(text, context).then(data => {
         res.send(JSON.stringify(updateMessage(data)));
