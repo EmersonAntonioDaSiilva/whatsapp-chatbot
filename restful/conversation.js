@@ -3,7 +3,7 @@ var bodyParser = require('body-parser'); // parser for post requests
 const watson = require('watson-developer-cloud');
 
 var app = express();
-app.use(bodyParser.json());
+app.use(bodyParser.json({type: 'application/json' }));
 
 const conversation = new watson.conversation({
   username: 'fb3ea18a-08b4-48ee-ac83-630fe19a68ef',
@@ -31,11 +31,9 @@ app.post('/message', function(req, res) {
     var text = req.body.text;
 
     message(text, undefined).then(data => {
-        console.log(JSON.stringify(data, null, 2), '\n--------');
-        return updateMessage(data);
+        return res.send(JSON.stringify(data));
+        //return updateMessage(data);
     }).catch(err => {
-        // APPLICATION-SPECIFIC CODE TO PROCESS THE ERROR
-        // FROM CONVERSATION SERVICE
         console.error(JSON.stringify(err, null, 2));
     });
 });
