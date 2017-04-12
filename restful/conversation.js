@@ -29,9 +29,8 @@ const message = function(text, context) {
 
 app.post('/message', function(req, res) {
     var text = req.body.text;
-    console.log("Teste de dados" + text);
 
-    message('first message', undefined).then(data => {
+    message(text, undefined).then(data => {
         console.log(JSON.stringify(data, null, 2), '\n--------');
         return updateMessage(data);
     }).catch(err => {
