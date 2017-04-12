@@ -29,8 +29,9 @@ const message = function(text, context) {
 
 app.post('/message', function(req, res) {
     var text = req.body.text;
+    var context = req.body.context;
 
-    message(text, undefined).then(data => {
+    message(text, context).then(data => {
         res.send(JSON.stringify(updateMessage(data)));
     }).catch(err => {
         console.error(JSON.stringify(err, null, 2));
@@ -44,6 +45,7 @@ function updateMessage(response) {
     } else {
         return response;
     }
+    console.log(" === Passou por aqui: function updateMessage === ");
     if (response.intents && response.intents[0]) {
         var intent = response.intents[0];
 
