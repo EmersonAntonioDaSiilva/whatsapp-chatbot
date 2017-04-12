@@ -1,60 +1,64 @@
 var express = require('express');
 var bodyParser = require('body-parser'); // parser for post requests
-var Conversation = require('watson-developer-cloud/conversation/v1'); // watson sdk
+const watson = require('watson-developer-cloud');
 
 var app = express();
 app.use(bodyParser.json());
 
-var conversation = new Conversation({
-  url: 'https://gateway.watsonplatform.net/conversation/api',
-  version_date: '2016-10-21',
-  version: 'v1'
+const conversation = new watson.ConversationV1({
+  username: process.env.CONVERSATION_USERNAME || '<conversation_username>',
+  password: process.env.CONVERSATION_PASSWORD || '<conversation_password>',
+  version_date: watson.ConversationV1.VERSION_DATE_2017_02_03
 });
+
+const message = function(text, context) {
+    const payload = {
+        workspace_id: process.env.WORKSPACE_ID || '<workspace_id>',
+        input: {
+            text: text
+        },
+        context: context
+    };
+    return new Promise((resolve, reject) => conversation.message(payload, function(err, data) {
+        if (err) {
+            reject(err);
+        } else {
+            resolve(data);
+        }
+    }));
+};
 
 app.post('/message', function(req, res) {
-  var workspace = process.env.WORKSPACE_ID || '<workspace-id>';
-  if (!workspace || workspace === '<workspace-id>') {
-    return res.json({
-      'output': {
-        'text': 'The app has not been configured with a <b>WORKSPACE_ID</b> environment variable. Please refer to the ' + '<a href="https://github.com/watson-developer-cloud/conversation-simple">README</a> documentation on how to set this variable. <br>' + 'Once a workspace has been defined the intents may be imported from ' + '<a href="https://github.com/watson-developer-cloud/conversation-simple/blob/master/training/car_workspace.json">here</a> in order to get a working application.'
-      }
+    message('first message', undefined).then(data => {
+        console.log(JSON.stringify(data, null, 2), '\n--------');
+        return updateMessage(data);
+    }).catch(err => {
+        // APPLICATION-SPECIFIC CODE TO PROCESS THE ERROR
+        // FROM CONVERSATION SERVICE
+        console.error(JSON.stringify(err, null, 2));
     });
-  }
-
-  var payload = {
-    workspace_id: workspace,
-    context: req.body.context || {},
-    input: req.body.input || {}
-  };
-
-  conversation.message(payload, function(err, data) {
-    if (err) {
-      return res.status(err.code || 500).json(err);
-    }
-    return res.json(updateMessage(payload, data));
-  });
 });
 
-function updateMessage(input, response) {
-  var responseText = null;
-  if (!response.output) {
-    response.output = {};
-  } else {
-    return response;
-  }
-  if (response.intents && response.intents[0]) {
-    var intent = response.intents[0];
-
-    if (intent.confidence >= 0.75) {
-      responseText = 'I understood your intent was ' + intent.intent;
-    } else if (intent.confidence >= 0.5) {
-      responseText = 'I think your intent was ' + intent.intent;
+function updateMessage(response) {
+    var responseText = null;
+    if (!response.output) {
+        response.output = {};
     } else {
-      responseText = 'I did not understand your intent';
+        return response;
     }
-  }
-  response.output.text = responseText;
-  return response;
+    if (response.intents && response.intents[0]) {
+        var intent = response.intents[0];
+
+        if (intent.confidence >= 0.75) {
+            responseText = 'I understood your intent was ' + intent.intent;
+        } else if (intent.confidence >= 0.5) {
+            responseText = 'I think your intent was ' + intent.intent;
+        } else {
+            responseText = 'I did not understand your intent';
+        }
+    }
+    response.output.text = responseText;
+    return response;
 }
 
 module.exports = app;
