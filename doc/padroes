@@ -1,0 +1,70 @@
+Em quais situações devera ser utilzado os tipos de funções rest
+
+POST /criar novo registrfo
+PUT /alterar registro
+DELETE /deletar Registro
+GET /captirar registro ou lista de registros
+
+Todos dever receber um json padrão
+
+{
+	send:{
+		"nome_sistema": "",
+		"entity": 
+	}
+	return:{
+		"token": "",
+		"status": ""
+	}
+}
+
+Exemplo: login
+usuario = {"nome":"Emerson Antonioo", "email":"esilva@magnasistemas.com.br", "senha":"maxstyll"}
+
+POST /login
+{
+	send:{
+		"nome_sistema": "Watson RH",
+		"entity": usuario
+	}
+	return:{
+		"token": "XXXXX",
+		"status": "200"
+	}
+}
+
+PUT /login
+{
+	send:{
+		"token": "XXXXX"
+		"nome_sistema": "Watson RH",
+		"entity": usuario
+	}
+	return:{
+		"token": "YYYYYY",
+		"status": "200"
+	}
+}
+
+DELETE /login
+{
+	send:{
+		"token": "YYYYYY"
+	}
+	return:{
+		"token": "",
+		"status": "200"
+	}
+}
+
+GET /login
+{
+	send:{
+		"nome_sistema": "Watson RH",
+		"entity": usuario
+	}
+	return:{
+		"token": "YYYYYY",
+		"status": "200"
+	}
+}
