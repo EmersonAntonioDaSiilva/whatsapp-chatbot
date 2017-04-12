@@ -6,14 +6,14 @@ var app = express();
 app.use(bodyParser.json());
 
 const conversation = new watson.ConversationV1({
-  username: process.env.CONVERSATION_USERNAME || '<conversation_username>',
-  password: process.env.CONVERSATION_PASSWORD || '<conversation_password>',
+  username: process.env.CONVERSATION_USERNAME || 'fb3ea18a-08b4-48ee-ac83-630fe19a68ef',
+  password: process.env.CONVERSATION_PASSWORD || '6qOUoIn3UXnD',
   version_date: watson.ConversationV1.VERSION_DATE_2017_02_03
 });
 
 const message = function(text, context) {
     const payload = {
-        workspace_id: process.env.WORKSPACE_ID || '<workspace_id>',
+        workspace_id: process.env.WORKSPACE_ID || 'd6fe397a-343b-47b5-a132-a1def577b235',
         input: {
             text: text
         },
