@@ -5,18 +5,17 @@ const watson = require('watson-developer-cloud');
 var app = express();
 app.use(bodyParser.json());
 
-const conversation = new watson.ConversationV1({
-  username: process.env.CONVERSATION_USERNAME || 'fb3ea18a-08b4-48ee-ac83-630fe19a68ef',
-  password: process.env.CONVERSATION_PASSWORD || '6qOUoIn3UXnD',
-  version_date: watson.ConversationV1.VERSION_DATE_2017_02_03
+const conversation = new watson.conversation({
+  username: 'fb3ea18a-08b4-48ee-ac83-630fe19a68ef',
+  password: '6qOUoIn3UXnD',
+  version: 'v1',
+  version_date: '2017-02-03'
 });
 
 const message = function(text, context) {
     const payload = {
-        workspace_id: process.env.WORKSPACE_ID || 'd6fe397a-343b-47b5-a132-a1def577b235',
-        input: {
-            text: text
-        },
+        workspace_id: 'd6fe397a-343b-47b5-a132-a1def577b235',
+        input: {'text': text},
         context: context
     };
     return new Promise((resolve, reject) => conversation.message(payload, function(err, data) {
@@ -29,6 +28,7 @@ const message = function(text, context) {
 };
 
 app.post('/message', function(req, res) {
+    var text = req.body.text;
     message('first message', undefined).then(data => {
         console.log(JSON.stringify(data, null, 2), '\n--------');
         return updateMessage(data);
