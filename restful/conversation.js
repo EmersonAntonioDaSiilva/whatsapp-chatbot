@@ -34,8 +34,7 @@ app.post('/message', function(req, res) {
     console.log(text);
 
     message(text).then(data => {
-        console.log(JSON.stringify(data));
-        res.send(JSON.stringify(updateMessage(data)));
+        res.send(JSON.stringify(data));
     }).catch(err => {
         console.error(JSON.stringify(err, null, 2));
     });
