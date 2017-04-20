@@ -3,7 +3,21 @@ var bodyParser = require('body-parser'); // parser for post requests
 var ConversationV1 = require('watson-developer-cloud/conversation/v1');
 
 var countRecod = 0;
-var dbprints = require('../dao/genericDAO');
+
+var cfenv = require('cfenv');
+var appEnv = cfenv.getAppEnv();
+var dbCreds =  appEnv.getServiceCreds('analitycsNLCdb');
+
+var nano, prints;
+
+if (dbCreds) {
+	console.log('URL is ' + dbCreds.url);
+	nano = require('nano')(dbCreds.url);
+	prints = nano.use('prints');
+} else {
+	console.log('NO DB!');
+}
+
 
 
 var app = express();
@@ -43,8 +57,9 @@ app.post('/message', function(req, res) {
 function updateMessage(response) {
         console.log(JSON.stringify(response));
         countRecod ++;        
+        console.log(countRecod);
 
-        dbprints.insert({ 'whatsapp-chatbot': response}, 'whatsapp_' + countRecod, function(err, body, header) {
+        prints.insert({ 'whatsapp-chatbot': response}, 'whatsapp_' + countRecod, function(err, body, header) {
                         if (err) {
                             console.log('Error creating document - ', err.message);
                             return;
