@@ -42,12 +42,9 @@ app.post('/message', function(req, res) {
 
 function updateMessage(response) {
         console.log(JSON.stringify(response));
-
-        var longDate = new DateTime();
-        var intent = response.intents[0];
         countRecod ++;        
 
-        dbprints.insert({ 'whatsapp-chatbot': response}, 'whatsapp_' + countRecod + '_' + longDate, function(err, body, header) {
+        dbprints.insert({ 'whatsapp-chatbot': response}, 'whatsapp_' + countRecod, function(err, body, header) {
                         if (err) {
                             console.log('Error creating document - ', err.message);
                             return;
