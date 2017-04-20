@@ -3,7 +3,7 @@ var bodyParser = require('body-parser'); // parser for post requests
 const watson = require('watson-developer-cloud');
 
 var countRecod = 0;
-var dbprints = require('./dao/genericDAO');
+var dbprints = require('../dao/genericDAO');
 
 
 var app = express();
