@@ -3,7 +3,7 @@ var bodyParser = require('body-parser'); // parser for post requests
 var ConversationV1 = require('watson-developer-cloud/conversation/v1');
 
 var countRecod = 0;
-var dbprints = require('../dao/genericDAO');
+//var dbprints = require('../dao/genericDAO');
 
 
 var app = express();
@@ -55,14 +55,14 @@ function updateMessage(response) {
         
         console.log(JSON.stringify(intent));
 
-        dbprints.insert({ 'whatsapp-chatbot': response}, 'whatsapp_' + countRecod + '_' + longDate, function(err, body, header) {
-                        if (err) {
-                            console.log('Error creating document - ', err.message);
-                            return;
-                        }
-                        console.log('all records inserted.')
-                        console.log(body);
-                        });
+//        dbprints.insert({ 'whatsapp-chatbot': response}, 'whatsapp_' + countRecod + '_' + longDate, function(err, body, header) {
+//                        if (err) {
+//                            console.log('Error creating document - ', err.message);
+//                            return;
+//                        }
+//                        console.log('all records inserted.')
+//                        console.log(body);
+//                        });
         return response;
     }
     console.log(" === Passou por aqui: function updateMessage === ");
