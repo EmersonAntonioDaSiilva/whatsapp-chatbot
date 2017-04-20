@@ -1,7 +1,16 @@
-var db
-exports.db = function() {
-    if (db === null) {
-        db = dblibrary.createClient()
+var cfenv = require('cfenv');
+var appEnv = cfenv.getAppEnv();
+var dbCreds =  appEnv.getServiceCreds('analitycsNLCDipoldb');
+var nano, prints;
+
+exports.prints = function() {
+    if (prints === null) {
+        if (dbCreds) {
+            nano = require('nano')(dbCreds.url);
+            prints = nano.use('prints');
+        } else {
+            console.log('NO DB!');
+        }
     }
-    return db
+    return prints;
 }

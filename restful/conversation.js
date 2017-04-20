@@ -2,6 +2,9 @@ var express = require('express');
 var bodyParser = require('body-parser'); // parser for post requests
 const watson = require('watson-developer-cloud');
 
+var dbprints = require('./dao/genericDAO');
+
+
 var app = express();
 app.use(bodyParser.json({type: 'application/json' }));
 
@@ -40,9 +43,23 @@ app.post('/message', function(req, res) {
 
 function updateMessage(response) {
     var responseText = null;
+
+
     if (!response.output) {
         response.output = {};
     } else {
+
+        var longDate = new DateTime();
+        var intent = response.intents[0];
+
+        dbprints.insert({ 'dados': response}, 'whatsapp-chatbot_' + intent.class_name + '_' + longDate, function(err, body, header) {
+                        if (err) {
+                            console.log('Error creating document - ', err.message);
+                            return;
+                        }
+                        console.log('all records inserted.')
+                        console.log(body);
+                        });
         return response;
     }
     console.log(" === Passou por aqui: function updateMessage === ");
