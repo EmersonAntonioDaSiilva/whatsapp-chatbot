@@ -2,6 +2,7 @@ var express = require('express');
 var bodyParser = require('body-parser'); // parser for post requests
 const watson = require('watson-developer-cloud');
 
+var countRecod = 0;
 var dbprints = require('./dao/genericDAO');
 
 
@@ -51,8 +52,9 @@ function updateMessage(response) {
 
         var longDate = new DateTime();
         var intent = response.intents[0];
+        countRecod = countRecod + 1;
 
-        dbprints.insert({ 'dados': response}, 'whatsapp-chatbot_' + intent.class_name + '_' + longDate, function(err, body, header) {
+        dbprints.insert({ 'whatsapp-chatbot': response}, 'whatsapp_' + countRecod + '_' + longDate, function(err, body, header) {
                         if (err) {
                             console.log('Error creating document - ', err.message);
                             return;

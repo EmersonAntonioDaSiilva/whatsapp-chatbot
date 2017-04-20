@@ -1,6 +1,6 @@
 var cfenv = require('cfenv');
 var appEnv = cfenv.getAppEnv();
-var dbCreds =  appEnv.getServiceCreds('analitycsNLCDipoldb');
+var dbCreds =  appEnv.getServiceCreds('analitycsNLCdb');
 var nano, prints;
 
 exports.prints = function() {
