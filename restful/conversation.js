@@ -55,19 +55,19 @@ app.post('/message', function(req, res) {
 });
 
 function updateMessage(response) {
-        console.log(JSON.stringify(response));
-        countRecod ++;        
-        console.log(countRecod);
+    console.log(JSON.stringify(response));
+    countRecod ++;        
+    console.log(countRecod);
 
-        prints.insert({ 'whatsapp-chatbot': response}, 'whatsapp_' + countRecod, function(err, body, header) {
-                        if (err) {
-                            console.log('Error creating document - ', err.message);
-                            return;
-                        }
-                        console.log('all records inserted.')
-                        console.log(body);
-                        });
-        return response;
+    prints.insert({ 'whatsapp-chatbot': response}, 'whatsapp_' + countRecod, function(err, body, header) {
+                    if (err) {
+                        console.log('Error creating document - ', err.message);
+                        return;
+                    }
+                    console.log('all records inserted.')
+                    console.log(body);
+                    });
+    return response;
 }
 
 module.exports = app;

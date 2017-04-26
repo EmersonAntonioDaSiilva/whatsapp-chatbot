@@ -1,0 +1,23 @@
+.modal {
+    display: none;
+    position: fixed;
+    left: 0;
+    right: 0;
+    background-color: #fafafa;
+    padding: 0;
+    max-height: 37%;
+    width: 37%;
+    margin: auto;
+    overflow-y: auto;
+    border-radius: 2px;
+    will-change: top, opacity;
+}
+
+.modal .modal-content {
+    padding: 15px;
+}
+
+.modal-dialog {
+    max-width: 500px;
+    margin: auto;
+}

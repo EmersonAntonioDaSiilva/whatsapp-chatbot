@@ -1,0 +1,27 @@
+  <div class="row justify-content-md-center">  
+    <div class="card w-50">
+      <div class="card-header">
+        <div class="row">
+          <i class="medium material-icons">lock_outline</i> 
+          <h4>Autenticação</h4>
+        </div>        
+      </div>
+      <div class="card-block">
+        <div class="row">
+          <div class="input-field col s12">
+            <input id="email" type="email" [(ngModel)]="userAuth.email" class="validate">
+            <label for="email">Email</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field col s12">
+            <input id="password" type="password" [(ngModel)]="userAuth.senha" class="validate">
+            <label for="password">Password</label>
+          </div>
+        </div>
+        <div class="right">      
+            <button type="button" class="btn btn-default light-blue darken-4" (click)="fazerLogin()"><i class="material-icons">lock_open</i> Confirmar</button>
+        </div>
+      </div>
+    </div>
+  </div>  

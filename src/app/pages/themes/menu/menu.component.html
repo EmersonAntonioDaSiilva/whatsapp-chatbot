@@ -1,0 +1,17 @@
+<nav class="blue-grey darken-3">
+    <div class="nav-wrapper">
+      <a (click)="logof()" class="brand-logo right blue-grey darken-2"><i class="material-icons right">power_settings_new</i></a>
+      <ul id="nav-mobile" class="left hide-on-med-and-down">
+        <li><a class="dropdown-button" data-activates="dropdown1">Administrativo<i class="material-icons right">arrow_drop_down</i></a></li>
+        
+        <ul id="dropdown1" class="dropdown-content">
+          <li routerLinkActive="active"><a routerLink="/usuario" class="dropdown-item">Usuário</a></li>
+          <li routerLinkActive="active"><a routerLink="/perfil" class="dropdown-item">Perfil de acesso</a></li>
+          <li routerLinkActive="active"><a routerLink="/permicao" class="dropdown-item">Permições</a></li>
+          <li class="divider"></li>
+          <li routerLinkActive="active"><a routerLink="/empresa" class="dropdown-item">Empresa</a></li>
+          <li routerLinkActive="active"><a routerLink="/endereco" class="dropdown-item">Endereço</a></li>
+        </ul>
+      </ul>
+    </div>
+</nav>

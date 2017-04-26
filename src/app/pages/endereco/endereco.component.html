@@ -1,0 +1,294 @@
+    <!-- Consultar Registros -->
+    <div id="viewConsult" class="row justify-content-md-center" *ngIf="isSeach()">
+      <div class="card w-100">
+        <div class="card-header">
+          <div class="row">
+            <i class="medium material-icons">location_on</i> 
+            <h4>Consultar Endereço</h4>
+          </div>
+        </div>
+          <div class="card-block">
+            <!-- Campos de Busca -->
+            <div class="row">
+              <div class="input-field col-4">
+                <input id="txtCep" [(ngModel)]="endereco.cep" type="text" class="validate">
+                <label class="active" for="txtCep">Cep:</label>
+              </div>
+              <div class="input-field col-8">
+                <input id="txtLograd" [(ngModel)]="endereco.logradouro" type="text" class="validate">
+                <label class="active" for="txtLograd">Logradouro:</label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="input-field col-4">
+                <input id="txtBairro" [(ngModel)]="endereco.bairro" type="text" class="validate">
+                <label class="active" for="txtEstado">Bairro:</label>
+              </div>        
+              <div class="form-group col-4">
+                <label for="slcEstado">Estado / UF:</label>
+                <select class="form-control" id="slcEstado" [(ngModel)]="endereco.municipio.estado.uf">
+                  <option value="AC">Acre - AC</option>
+                  <option value="AL">Alagoas - AL</option>
+                  <option value="AP">Amapá - AP</option>
+                  <option value="AM">Amazonas - AM</option>
+                  <option value="BA">Bahia - BA</option>
+                  <option value="CE">Ceará - CE</option>
+                  <option value="DF">Distrito Federal - DF</option>
+                  <option value="ES">Espírito Santo - ES</option>
+                  <option value="GO">Goiás - GO</option>
+                  <option value="MA">Maranhão - MA</option>
+                  <option value="MT">Mato Grosso - MT</option>
+                  <option value="MS">Mato Grosso do Sul - MS</option>
+                  <option value="MG">Minas Gerais - MG</option>
+                  <option value="PA">Pará - PA</option>
+                  <option value="PB">Paraíba - PB</option>
+                  <option value="PR">Paraná - PR</option>
+                  <option value="PE">Pernambuco - PE</option>
+                  <option value="PI">Piauí - PI</option>
+                  <option value="RJ">Rio de Janeiro - RJ</option>
+                  <option value="RN">Rio Grande do Norte - RN</option>
+                  <option value="RS">Rio Grande do Sul - RS</option>
+                  <option value="RO">Rondônia - RO</option>
+                  <option value="RR">Roraima - RR</option>
+                  <option value="SC">Santa Catarina - SC</option>
+                  <option value="SP" selected>São Paulo - SP</option>
+                  <option value="SE">Sergipe - SE</option>
+                  <option value="TO">Tocantins - TO</option>
+                </select>
+              </div>
+              <div class="form-group col-4">
+                <label for="slcMunicipio">Município:</label>
+                <select class="form-control" id="slcMunicipio" [(ngModel)]="endereco.municipio.nome" >
+                  <option value="Osasco" selected>Osasco</option>
+                  <option value="Carapicuiba">Carapicuiba</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Botoes de Operações -->
+            <div class="row">
+              <div class="col-12">      
+                <div class="right">
+                  <button class="btn btn-default light-blue darken-4" (click)="searchDados()"><i class="material-icons">search</i> Consultar</button>
+                  <button class="btn light-blue darken-4" (click)="insertDados()"><i class="material-icons">open_in_new</i> Incluir</button>                
+                  <button class="btn light-blue darken-4" (click)="cleanDados()"><i class="material-icons">clear_all</i> Limpar</button>
+                </div>
+              </div>
+            </div>
+            <!-- Grid dos resultados encontrados -->
+            <div class="container-fluid">
+              <div class="header-grid row light-blue lighten-1">
+                <div class="col-12 center">
+                  <h5>Resultado encontrado</h5>
+                </div>
+              </div>
+
+              <table class="table table-striped table-bordered">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Cep</th>
+                    <th>Logradouro</th>
+                    <th>Bairro</th>
+                    <th>Município</th>
+                    <th>Estado</th>
+                    <th>operações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template ngFor [ngForOf]="enderecos" let-endereco let-i="index">
+                    <tr>
+                      <th scope="row">{{ i + 1 }}</th>
+                      <td><p>{{ endereco.cep }}</p></td>
+                      <td><p>{{ endereco.logradouro }}</p></td>
+                      <td><p>{{ endereco.bairro }}</p></td>
+                      <td><p>{{ endereco.municipio?.nome }}</p></td>
+                      <td><p>{{ endereco.municipio?.estado?.uf + '-' + endereco.municipio?.estado?.nome }}</p></td>
+                      <td class="center">
+                        <button (click)="detailDados(endereco)"><i class="tiny material-icons">view_headline</i></button>
+                        <button (click)="updateDados(endereco)"><i class="tiny material-icons">mode_edit</i></button>
+                        <button data-toggle="modal" data-target=".bd-example-modal-sm"><i class="tiny material-icons">delete</i></button>
+                      </td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+
+            <div class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title">Excluir Registro</h5>
+                    <button class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    <p>Realmente deseja EXCLUIR este registro?</p>
+                  </div>
+                  <div class="modal-footer">
+                    <button (click)="deleteDados(endereco)" data-dismiss="modal"><i class="tiny material-icons">thumb_up</i> SIM</button>
+                    <button data-dismiss="modal"><i class="tiny material-icons">thumb_down</i> NÃO</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+              <div class="row align-items-end footer-grid">
+                  <nav class="light-blue lighten-1">
+                    <ul class="pagination justify-content-center">
+                      <li class="page-item">
+                        <a class="page-link" href="#" aria-label="Previous">
+                          <span aria-hidden="true">&laquo;</span>
+                          <span class="sr-only">Previous</span>
+                        </a>
+                      </li>
+                      <li class="page-item">
+                        <a class="page-link active" href="#">1</a>
+                        
+                      </li>
+                      <li class="page-item"><a class="page-link" href="#">2</a></li>
+                      <li class="page-item"><a class="page-link" href="#">3</a></li>
+                      <li class="page-item">
+                        <a class="page-link" href="#" aria-label="Next">
+                          <span aria-hidden="true">&raquo;</span>
+                          <span class="sr-only">Next</span>
+                        </a>
+                      </li>
+                    </ul>
+                  </nav>
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+
+    <!-- Detalhes do Registro -->
+    <div id="viewDetails" class="row justify-content-md-center" *ngIf="isDetails()">
+      <div class="card w-100">
+        <div class="card-header">
+          <div class="row">
+            <i class="medium material-icons">location_on</i> 
+            <h4>Consultar Endereço</h4>
+          </div>
+        </div>
+          <div class="card-block">
+            <div class="row">
+              <div class="form-group col-4">
+                <strong>Cep: </strong>
+                <label>{{ endereco.cep }}</label>
+              </div>
+              <div class="form-group col-8">
+                <strong>Logradouro: </strong>
+                <label>{{ endereco.logradouro }}</label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="form-group col-4">
+                <strong>Bairro: </strong>
+                <label>{{ endereco.bairro }}</label>
+              </div>        
+              <div class="form-group col-4">
+                <strong>Estado / UF: </strong>
+                <label>{{ endereco.municipio?.estado?.uf }}</label>
+              </div>
+              <div class="form-group col-4">
+                <strong>Município: </strong>
+                <label>{{ endereco.municipio?.nome }}</label>
+              </div>
+            </div>
+
+            <!-- Botoes de Operações -->
+            <div class="row">
+              <div class="col-12">      
+                <div class="right">
+                  <button class="btn light-blue darken-4" (click)="cleanDados()"><i class="material-icons">open_in_new</i> OK</button>                
+                  <button class="btn btn-default light-blue darken-4" (click)="updateDados(endereco)"><i class="material-icons">search</i> Alterar</button>
+                  <button class="btn light-blue darken-4" (click)="cleanDados()"><i class="material-icons">open_in_new</i> Excluir</button>                
+                </div>
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+
+    <!-- Incluir ou Alterar o Registro -->
+    <div id="viewEditOrNew" class="row justify-content-md-center" *ngIf="isEditOrNew()">
+      <div class="card w-100">
+        <div class="card-header">
+          <div class="row">
+            <i class="medium material-icons">location_on</i> 
+            <h4>Consultar Endereço</h4>
+          </div>
+        </div>
+          <div class="card-block">
+            <!-- Campos de Busca -->
+            <div class="row">
+              <div class="input-field col-4">
+                <input id="txtCep" [(ngModel)]="endereco.cep" type="text" class="validate">
+                <label class="active" for="txtCep">Cep:</label>
+              </div>
+              <div class="input-field col-8">
+                <input id="txtLograd" [(ngModel)]="endereco.logradouro" type="text" class="validate">
+                <label class="active" for="txtLograd">Logradouro:</label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="input-field col-4">
+                <input id="txtBairro" [(ngModel)]="endereco.bairro" type="text" class="validate">
+                <label class="active" for="txtEstado">Bairro:</label>
+              </div>        
+              <div class="form-group col-4">
+                <label for="slcEstado">Estado / UF:</label>
+                <select class="form-control" id="slcEstado" [(ngModel)]="endereco.municipio.estado.uf">
+                  <option value="AC">Acre - AC</option>
+                  <option value="AL">Alagoas - AL</option>
+                  <option value="AP">Amapá - AP</option>
+                  <option value="AM">Amazonas - AM</option>
+                  <option value="BA">Bahia - BA</option>
+                  <option value="CE">Ceará - CE</option>
+                  <option value="DF">Distrito Federal - DF</option>
+                  <option value="ES">Espírito Santo - ES</option>
+                  <option value="GO">Goiás - GO</option>
+                  <option value="MA">Maranhão - MA</option>
+                  <option value="MT">Mato Grosso - MT</option>
+                  <option value="MS">Mato Grosso do Sul - MS</option>
+                  <option value="MG">Minas Gerais - MG</option>
+                  <option value="PA">Pará - PA</option>
+                  <option value="PB">Paraíba - PB</option>
+                  <option value="PR">Paraná - PR</option>
+                  <option value="PE">Pernambuco - PE</option>
+                  <option value="PI">Piauí - PI</option>
+                  <option value="RJ">Rio de Janeiro - RJ</option>
+                  <option value="RN">Rio Grande do Norte - RN</option>
+                  <option value="RS">Rio Grande do Sul - RS</option>
+                  <option value="RO">Rondônia - RO</option>
+                  <option value="RR">Roraima - RR</option>
+                  <option value="SC">Santa Catarina - SC</option>
+                  <option value="SP" selected>São Paulo - SP</option>
+                  <option value="SE">Sergipe - SE</option>
+                  <option value="TO">Tocantins - TO</option>
+                </select>
+              </div>
+              <div class="form-group col-4">
+                <label for="slcMunicipio">Município:</label>
+                <select class="form-control" id="slcMunicipio" [(ngModel)]="endereco.municipio.nome" >
+                  <option value="Osasco" selected>Osasco</option>
+                  <option value="Carapicuiba">Carapicuiba</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Botoes de Operações -->
+            <div class="row">
+              <div class="col-12">      
+                <div class="right">
+                  <button class="btn btn-default light-blue darken-4" (click)="saveDados()"><i class="material-icons">search</i> Salvar</button>
+                  <button class="btn light-blue darken-4" (click)="cleanDados()"><i class="material-icons">open_in_new</i> Cancelar</button>                
+                </div>
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+    

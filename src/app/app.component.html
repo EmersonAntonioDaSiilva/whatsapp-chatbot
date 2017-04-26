@@ -1,0 +1,30 @@
+<header>
+  <app-header></app-header>  
+</header>      
+<app-menu></app-menu>
+<body>
+  <div class="container-fluid">
+    <div class="alert alert-info" role="alert" *ngIf="isMsgSuccessful()">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>      
+      <strong>Sucesso!</strong> {{ messageTransport.message }}
+    </div>
+    <div class="alert alert-warning" role="alert" *ngIf="isMsgWarning()">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>            
+      <strong>Atenção!</strong> {{ messageTransport.message }}
+    </div>
+    <div class="alert alert-danger" role="alert" *ngIf="isMsgError()">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>            
+      <strong>Erro!</strong> {{ messageTransport.message }}
+    </div>    
+    <router-outlet></router-outlet>
+  </div>
+</body>
+<footer class="blue-grey darken-3">
+  <app-footer></app-footer>  
+</footer>
