@@ -8,31 +8,34 @@ var cfenv = require('cfenv');
 var appEnv = cfenv.getAppEnv();
 var dbCreds =  appEnv.getServiceCreds('analitycsNLCdb');
 
-var nano, prints;
+var nano;
 
 if (dbCreds) {
 	console.log('URL is ' + dbCreds.url);
 	nano = require('nano')(dbCreds.url);
-	prints = nano.use('prints');
 } else {
-	console.log('NO DB!');
+    nano = require('nano')('https://ab46cb82-f091-4fea-b622-11049ed033af-bluemix:9c25511ba5185fde1746a9f31bd8b351c75510b7c8aca12c9ccf3c5bc14c0f2e@ab46cb82-f091-4fea-b622-11049ed033af-bluemix.cloudant.com');
 }
 
+var prints = nano.use('prints');
 
+var chatbot = express();
+chatbot.use(bodyParser.json({type: 'application/json' }));
 
-var app = express();
-app.use(bodyParser.json({type: 'application/json' }));
+var username = process.env.CONVERSATION_USERNAME || '<username>';
+var password = process.env.CONVERSATION_PASSWORD || '<password>';
+var workspace = process.env.WORKSPACE_ID || '<workspace-id>';
 
 const conversation = new ConversationV1({
-  username: 'fb3ea18a-08b4-48ee-ac83-630fe19a68ef',
-  password: '6qOUoIn3UXnD',
+  username: username,
+  password: password,
   version_date: ConversationV1.VERSION_DATE_2017_02_03
 });
 
 const message = function(text) {
     const payload = {
         input: {'text': text},
-        workspace_id: 'd6fe397a-343b-47b5-a132-a1def577b235'
+        workspace_id: workspace
     };
     return new Promise((resolve, reject) => conversation.message(payload, function(err, data) {
         if (err) {
@@ -43,9 +46,8 @@ const message = function(text) {
     }));
 };
 
-app.post('/message', function(req, res) {
+chatbot.post('/message', function(req, res) {
     var text = req.body.text;
-    console.log(text);
 
     message(text).then(data => {
         res.send(JSON.stringify(updateMessage(data)));
@@ -57,17 +59,16 @@ app.post('/message', function(req, res) {
 function updateMessage(response) {
     console.log(JSON.stringify(response));
     countRecod ++;        
-    console.log(countRecod);
 
     prints.insert({ 'whatsapp-chatbot': response}, 'whatsapp_' + countRecod, function(err, body, header) {
-                    if (err) {
-                        console.log('Error creating document - ', err.message);
-                        return;
-                    }
-                    console.log('all records inserted.')
-                    console.log(body);
-                    });
+        if (err) {
+            console.log('Error creating document - ', err.message);
+            return;
+        }
+        console.log('all records inserted.')
+        console.log(body);
+    });
     return response;
 }
 
-module.exports = app;
+module.exports = chatbot;
