@@ -29,11 +29,29 @@ Fire up your favorite editor, create and save a ``sample.js`` file like below::
 
     casper.run();
 
-Run it:
+Run it (with python):
 
 .. code-block:: text
 
     $ casperjs sample.js
+    
+Run it (with node):
+
+.. code-block:: text
+
+    $ node casperjs.js sample.js
+    
+Run it (with PhantomJS):
+
+.. code-block:: text
+
+    $ phantomjs casperjs.js sample.js
+    
+Run it (on windows):
+
+.. code-block:: text
+
+    C:\casperjs\bin> casperjs.exe sample.js
 
 You should get something like this:
 
@@ -72,10 +90,15 @@ Fire up your favorite editor and save the javascript code below in a
     }
 
     casper.start('http://google.fr/', function() {
-        // search for 'casperjs' from google form
-        this.fill('form[action="/search"]', { q: 'casperjs' }, true);
+       // Wait for the page to be loaded
+       this.waitForSelector('form[action="/search"]');
     });
-
+   
+    casper.then(function() {
+       // search for 'casperjs' from google form
+       this.fill('form[action="/search"]', { q: 'casperjs' }, true);
+    });
+    
     casper.then(function() {
         // aggregate results for the 'casperjs' search
         links = this.evaluate(getLinks);

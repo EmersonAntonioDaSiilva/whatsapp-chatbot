@@ -1,6 +1,33 @@
 /*eslint strict:0*/
 var fs = require('fs');
 var selectXPath = require('casper').selectXPath;
+var exp = false;
+
+/**
+ * Known regression in 2.0.0, will be fixed in 2.0.1
+ * https://github.com/ariya/phantomjs/issues/12506
+ */
+function skipPhantom200 (test, nb) {
+    return test.skipIfEngine(nb, {
+        name: 'phantomjs',
+        version: {
+            min: '2.0.0',
+            max: '2.0.0'
+        },
+        message: 'form regression 12506'
+    });
+}
+
+function skipSlimer095 (test, nb) {
+    return test.skipIfEngine(nb, {
+        name: 'slimerjs',
+        version: {
+            min: '0.8.0',
+            max: '0.9.4'
+        },
+        message: 'filePicker method missing'
+    });
+}
 
 function testFormValues(test) {
     test.assertField('email', 'chuck@norris.com',
@@ -26,6 +53,16 @@ function testFormValues(test) {
                !__utils__.findOne('input[name="checklist[]"][value="2"]').checked &&
                 __utils__.findOne('input[name="checklist[]"][value="3"]').checked);
     }, true, 'can fill a list of checkboxes');
+    if (!skipPhantom200(test, 2)) {
+        test.assertEvalEquals(function() {
+            return __utils__.findOne('input[name="file"]').files.length === 1;
+        }, true, 'can select a file to upload');
+        if (!skipSlimer095(test,1)) {
+            test.assertEvalEquals(function() {
+               return __utils__.findOne('input[name="file"]').value.indexOf('README.md') !== -1;
+            }, true, 'can check a form file value');
+        }
+    }
 }
 
 function testUrl(test) {
@@ -41,22 +78,9 @@ function testUrl(test) {
     });
 }
 
-/**
- * Known regression in 2.0.0, will be fixed in 2.0.1
- * https://github.com/ariya/phantomjs/issues/12506
- */
-function skipPhantom200 (test, nb) {
-    return test.skipIfEngine(nb, {
-        name: 'phantomjs',
-        version: {
-            min: '2.0.0',
-            max: '2.0.0'
-        },
-        message: 'form regression 12506'
-    });
-}
 
-casper.test.begin('fill() & fillNames() tests', 18, function(test) {
+
+casper.test.begin('fill() & fillNames() tests', 19, function(test) {
     var fpath = fs.pathJoin(phantom.casperPath, 'README.md');
 
     casper.start('tests/site/form.html', function() {
@@ -73,11 +97,6 @@ casper.test.begin('fill() & fillNames() tests', 18, function(test) {
             strange:       "very"
         });
         testFormValues(test);
-        if (!skipPhantom200(test, 1)) {
-            test.assertEvalEquals(function() {
-                return __utils__.findOne('input[name="file"]').files.length === 1;
-            }, true, 'can select a file to upload');
-        }
     });
     casper.thenClick('input[type="submit"]', function() {
         testUrl(test);
@@ -87,7 +106,7 @@ casper.test.begin('fill() & fillNames() tests', 18, function(test) {
     });
 });
 
-casper.test.begin('fillLabels() tests', 18, function(test) {
+casper.test.begin('fillLabels() tests', 19, function(test) {
     var fpath = fs.pathJoin(phantom.casperPath, 'README.md');
 
     casper.start('tests/site/form.html', function() {
@@ -105,11 +124,6 @@ casper.test.begin('fillLabels() tests', 18, function(test) {
             Strange:       "very"
         });
         testFormValues(test);
-        if (!skipPhantom200(test, 1)) {
-            test.assertEvalEquals(function() {
-                return __utils__.findOne('input[name="file"]').files.length === 1;
-            }, true, 'can select a file to upload');
-        }
     });
     casper.thenClick('input[type="submit"]', function() {
         testUrl(test);
@@ -119,7 +133,7 @@ casper.test.begin('fillLabels() tests', 18, function(test) {
     });
 });
 
-casper.test.begin('fillSelectors() tests', 18, function(test) {
+casper.test.begin('fillSelectors() tests', 19, function(test) {
     var fpath = fs.pathJoin(phantom.casperPath, 'README.md');
 
     casper.start('tests/site/form.html', function() {
@@ -136,11 +150,6 @@ casper.test.begin('fillSelectors() tests', 18, function(test) {
             "input[name='strange']":      "very"
         });
         testFormValues(test);
-        if (!skipPhantom200(test, 1)) {
-            test.assertEvalEquals(function() {
-                return __utils__.findOne('input[name="file"]').files.length === 1;
-            }, true, 'can select a file to upload');
-        }
     });
     casper.thenClick('input[type="submit"]', function() {
         testUrl(test);
@@ -150,28 +159,48 @@ casper.test.begin('fillSelectors() tests', 18, function(test) {
     });
 });
 
-casper.test.begin('fillXPath() tests', 17, function(test) {
-    casper.start('tests/site/form.html', function() {
-        this.fillXPath('form[action="result.html"]', {
-            '//input[@name="email"]':       'chuck@norris.com',
-            '//input[@name="password"]':    42,
-            '//textarea[@name="content"]':  'Am watching thou',
-            '//input[@name="check"]':       true,
-            '//input[@name="choice"]':      'no',
-            '//select[@name="topic"]':      'bar',
-            '//select[@name="multitopic"]': ['bar', 'car'],
-            '//input[@name="checklist[]"]': ['1', '3'],
-            '//input[@name="strange"]':     "very"
+casper.test.begin('fillXPath() tests', 19, {
+
+    setUp: function(test) {
+        var self = this;
+        var fpath = fs.pathJoin(phantom.casperPath, 'README.md');
+        casper.removeAllFilters('page.filePicker');
+        casper.setFilter('page.filePicker', function() {
+            exp = true;
+            return fpath;
         });
-        testFormValues(test);
-        // note: file inputs cannot be filled using XPath
-    });
-    casper.thenClick('input[type="submit"]', function() {
-        testUrl(test);
-    });
-    casper.run(function() {
-        test.done();
-    });
+    },
+
+    tearDown: function(test) {
+        casper.removeAllFilters('page.filePicker');
+    },
+
+    test: function(test) {
+        var fpath = fs.pathJoin(phantom.casperPath, 'README.md');
+        casper.start('tests/site/form.html', function() {
+            this.fillXPath('form[action="result.html"]', {
+                '//input[@name="email"]':       'chuck@norris.com',
+                '//input[@name="password"]':    42,
+                '//textarea[@name="content"]':  'Am watching thou',
+                '//input[@name="check"]':       true,
+                '//input[@name="choice"]':      'no',
+                '//select[@name="topic"]':      'bar',
+                '//input[@name="file"]':         fpath,
+                '//select[@name="multitopic"]': ['bar', 'car'],
+                '//input[@name="checklist[]"]': ['1', '3'],
+                '//input[@name="strange"]':     "very"
+            });
+        });
+        casper.thenClick(selectXPath('//input[@name="file"]'), function() {
+            testFormValues(test);
+        });
+        casper.thenClick('input[type="submit"]', function() {
+            testUrl(test);
+        });
+        casper.run(function() {
+            test.done();
+        });
+    }
 });
 
 casper.test.begin('nonexistent fields', 1, function(test) {
@@ -339,7 +368,8 @@ casper.test.begin('fillSelectors() tests', 4, function(test) {
 //
 // setFieldValue() tests
 //
-casper.test.begin('setFieldValue() tests with css3 selector and form', 9, function(test) {
+casper.test.begin('setFieldValue() tests with css3 selector and form', 11, function(test) {
+    var fpath = fs.pathJoin(phantom.casperPath, 'README.md');
     casper.start('tests/site/form.html', function() {
         var data = {
             "input[name='email']":        'chuck@norris.com',
@@ -348,6 +378,7 @@ casper.test.begin('setFieldValue() tests with css3 selector and form', 9, functi
             "input[name='check']":        true,
             "input[name='choice']":       'no',
             "select[name='topic']":       'bar',
+            "input[name='file']":         fpath,
             "select[name='multitopic']":  ['bar', 'car'],
             "input[name='checklist[]']":  ['1', '3'],
             "input[name='strange']":      "very"
@@ -364,7 +395,8 @@ casper.test.begin('setFieldValue() tests with css3 selector and form', 9, functi
     });
 });
 
-casper.test.begin('setFieldValue() tests with XPath selector', 9, function(test) {
+casper.test.begin('setFieldValue() tests with XPath selector', 11, function(test) {
+    var fpath = fs.pathJoin(phantom.casperPath, 'README.md');
     casper.start('tests/site/form.html', function() {
         var data = {
             '//input[@name="email"]':       'chuck@norris.com',
@@ -373,6 +405,7 @@ casper.test.begin('setFieldValue() tests with XPath selector', 9, function(test)
             '//input[@name="check"]':       true,
             '//input[@name="choice"]':      'no',
             '//select[@name="topic"]':      'bar',
+            '//input[@name="file"]':         fpath,
             '//select[@name="multitopic"]': ['bar', 'car'],
             '//input[@name="checklist[]"]': ['1', '3'],
             '//input[@name="strange"]':     "very"
@@ -389,7 +422,8 @@ casper.test.begin('setFieldValue() tests with XPath selector', 9, function(test)
     });
 });
 
-casper.test.begin('setFieldValueName() tests', 9, function(test) {
+casper.test.begin('setFieldValueName() tests', 11, function(test) {
+    var fpath = fs.pathJoin(phantom.casperPath, 'README.md');
     casper.start('tests/site/form.html', function() {
         var data = {
             email:         'chuck@norris.com',
@@ -398,6 +432,7 @@ casper.test.begin('setFieldValueName() tests', 9, function(test) {
             check:         true,
             choice:        'no',
             topic:         'bar',
+            file:          fpath,
             multitopic:    ['bar', 'car'],
             'checklist[]': ['1', '3'],
             strange:       "very"
@@ -414,7 +449,8 @@ casper.test.begin('setFieldValueName() tests', 9, function(test) {
     });
 });
 
-casper.test.begin('setFieldValueLabel() tests', 9, function(test) {
+casper.test.begin('setFieldValueLabel() tests', 11, function(test) {
+    var fpath = fs.pathJoin(phantom.casperPath, 'README.md');
     casper.start('tests/site/form.html', function() {
         var data = {
             Email:         'chuck@norris.com',
@@ -423,12 +459,12 @@ casper.test.begin('setFieldValueLabel() tests', 9, function(test) {
             Check:         true,
             No:            true,
             Topic:         'bar',
+            File:          fpath,
             Multitopic:    ['bar', 'car'],
             "1":           true,
             "3":           true,
             Strange:       "very"     
         };
-
         for (var selector in data){
             this.setFieldValueLabel(selector, data[selector]);
         }

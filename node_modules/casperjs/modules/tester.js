@@ -28,7 +28,7 @@
  *
  */
 
-var require = patchRequire(require);
+require = patchRequire(require);
 var fs = require('fs');
 var events = require('events');
 var utils = require('utils');
@@ -114,6 +114,7 @@ var Tester = function Tester(casper, options) {
         failText: "FAIL", // text to use for a failed test
         passText: "PASS", // text to use for a succesful test
         skipText: "SKIP", // text to use for a skipped test
+        save:     false,  // false to not save 
         pad:      80    , // maximum number of chars for a result line
         warnText: "WARN"  // text to use for a dubious test
     }, options);
@@ -1128,15 +1129,6 @@ Tester.prototype.begin = function begin() {
         config = getConfig([].slice.call(arguments)),
         next = function() {
             config.test(this, this.casper);
-            if (!this.options.concise) {
-                this.casper.echo([
-                    this.colorize('PASS', 'INFO'),
-                    this.formatMessage(description),
-                    this.colorize(f('(%d test%s)',
-                                    config.planned,
-                                    config.planned > 1 ? 's' : ''), 'INFO')
-                ].join(' '));
-            }
         }.bind(this);
 
     if (!this.options.concise)
@@ -1226,6 +1218,24 @@ Tester.prototype.done = function done() {
         }
         if (this.currentSuite) {
             this.suiteResults.push(this.currentSuite);
+            
+            if (!this.options.concise) {
+                var message = [
+                    this.colorize('PASS', 'INFO'),
+                    this.formatMessage(this.currentSuite.name)
+                ];
+
+                if (config.planned) {
+                    message.push([
+                        this.colorize(f('(%d test%s)',
+                        config.planned,
+                        config.planned > 1 ? 's' : ''), 'INFO')
+                    ]);
+                }
+
+                this.casper.echo(message.join(' '));
+            }
+            
             this.currentSuite = undefined;
             this.executed = 0;
         }
